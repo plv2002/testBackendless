@@ -13,6 +13,8 @@ class ViewController: UIViewController {
     let backendless = Backendless.sharedInstance()
     
     
+    
+    
     class Accounts : NSObject {
         
         var objectId : String?
@@ -28,6 +30,7 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
+        // var to hold curent user to use
         var currentUser: BackendlessUser?
         currentUser = backendless.userService.currentUser
         let isStayLoggedIn = backendless.userService.isStayLoggedIn  // var check to see if user it still login
@@ -44,7 +47,7 @@ class ViewController: UIViewController {
         //print("registered")
         
         
-        
+        // check to see if keep logged in is turned on.
         if isStayLoggedIn == true{
             print("Current user \(currentUser!.email) is still logged in")
         }
@@ -152,7 +155,7 @@ class ViewController: UIViewController {
             
             let user = self.backendless.userService.login("test@outlook.com", password: "1234")
             print("User has been logged in (SYNC): \(user)")
-            self.backendless.userService.setStayLoggedIn( true )
+            self.backendless.userService.setStayLoggedIn( true )  // this is where I could check to see if they check the box to remember login
             },
                        
                        catchblock: { (exception) -> Void in
