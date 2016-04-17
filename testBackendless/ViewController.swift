@@ -12,9 +12,6 @@ class ViewController: UIViewController {
     
     let backendless = Backendless.sharedInstance()
     
-    
-    
-    
     class Accounts : NSObject {
         
         var objectId : String?
@@ -35,9 +32,6 @@ class ViewController: UIViewController {
         currentUser = backendless.userService.currentUser
         let isStayLoggedIn = backendless.userService.isStayLoggedIn  // var check to see if user it still login
         
-        
-        
-        //let backendless = Backendless.sharedInstance()
         //let user = BackendlessUser()
         
         //user.email = "test@outlook.com"
