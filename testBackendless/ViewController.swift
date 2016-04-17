@@ -103,7 +103,6 @@ class ViewController: UIViewController {
     }
     
     func queryData(){
-        //let backendless = Backendless.sharedInstance()
         
         //let queryAccount = Accounts()
         
