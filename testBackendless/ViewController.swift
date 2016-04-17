@@ -9,17 +9,158 @@
 import UIKit
 
 class ViewController: UIViewController {
+    
+    let backendless = Backendless.sharedInstance()
+    
+    
+    class Accounts : NSObject {
+        
+        var objectId : String?
+        var user : String?
+        var NumberOrNickname : String?
+        var type : String?
+        var Balance : Double = 0.00 // must initialize int/double/boolean values or it won't save on the backend
+        var InitialBalance : Double = 0.00
+    }
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        
+        var currentUser: BackendlessUser?
+        currentUser = backendless.userService.currentUser
+        let isStayLoggedIn = backendless.userService.isStayLoggedIn  // var check to see if user it still login
+        
+        
+        
+        //let backendless = Backendless.sharedInstance()
+        //let user = BackendlessUser()
+        
+        //user.email = "test@outlook.com"
+        //user.password = "1234"
+        
+        //backendless.userService.registering(user)
+        //print("registered")
+        
+        
+        
+        if isStayLoggedIn == true{
+            print("Current user \(currentUser!.email) is still logged in")
+        }
+        else{
+            loginUserAsync()
+        }
+        
+        
+        
+        //addRecord()
+        queryData()
+        queryData2()
+        
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    
+    
+    func addRecord(){
+        
+        let backendless = Backendless.sharedInstance()
+        
+        
+        let newAccount = Accounts()
+        newAccount.user = "test@msn.com"
+        newAccount.NumberOrNickname = "Checking3"
+        newAccount.type = "Checking"
+        newAccount.Balance = 200.05
+        newAccount.InitialBalance = 1000.54
+        
+        backendless.persistenceService.save(newAccount)
+        print("Saved Data")
+        
+        
+        
+//        let backendless = Backendless.sharedInstance()
+//        let dataStore = backendless.data.of(Accounts.ofClass())
+//        var error: Fault?
+//        
+//        let result = dataStore.findFault(&error)
+//        if error == nil {
+//            let contacts = result.getCurrentPage()
+//            for obj in contacts {
+//                print("\(obj)")
+//            }
+//        }
+//        else {
+//            print("Server reported an error: \(error)")
+//        }
+    }
+    
+    func queryData(){
+        //let backendless = Backendless.sharedInstance()
+        
+        //let queryAccount = Accounts()
+        
+        let dataQuery = BackendlessDataQuery()
+        
+        //dataQuery.queryOptions = queryOptions;
+        dataQuery.whereClause = "type = 'Checking'"
+        
+        let accounts = backendless.persistenceService.find(Accounts.ofClass(), dataQuery:dataQuery) as BackendlessCollection
+        for account in accounts.data as! [Accounts] {
+            
+            print("\(account.NumberOrNickname!)")
+        }
 
-
+    }
+    
+    func queryData2(){
+        //let backendless = Backendless.sharedInstance()
+        
+        //let queryAccount = Accounts()
+        
+        let dataQuery = BackendlessDataQuery()
+        
+        //dataQuery.queryOptions = queryOptions;
+        dataQuery.whereClause = "type = 'Checking'"
+        
+        let accounts = backendless.persistenceService.find(Accounts.ofClass(), dataQuery:dataQuery) as BackendlessCollection
+        for account in accounts.data as! [Accounts] {
+            
+            print("\(account.NumberOrNickname!)")
+        }
+        
+    }
+    
+    
+    func loginUserAsync() {
+        
+        //let backendless = Backendless.sharedInstance()
+        
+//        backendless.userService.login("test@outlook.com", password:"1234", response: { ( user : BackendlessUser!) -> () in
+//                    print("User has been logged in (ASYNC): \(user)")
+//            },
+//            error: { ( fault : Fault!) -> () in
+//                print("Server reported an error: \(fault)")
+//            }
+//        )
+        
+        Types.tryblock({ () -> Void in
+            
+            let user = self.backendless.userService.login("test@outlook.com", password: "1234")
+            print("User has been logged in (SYNC): \(user)")
+            self.backendless.userService.setStayLoggedIn( true )
+            },
+                       
+                       catchblock: { (exception) -> Void in
+                        print("Server reported an error: \(exception as! Fault)")
+        })
+    }
+    
 }
+
+
 
