@@ -11,6 +11,7 @@ import UIKit
 class ViewController: UIViewController {
     
     let backendless = Backendless.sharedInstance()
+    var currentUser: BackendlessUser?
     
     class Accounts : NSObject {
         
@@ -22,13 +23,18 @@ class ViewController: UIViewController {
         var InitialBalance : Double = 0.00
     }
     
+    class Users : NSObject{
+        var objectID : String?
+        var email : String?
+    }
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
         // var to hold curent user to use
-        var currentUser: BackendlessUser?
+        //var currentUser: BackendlessUser?
         currentUser = backendless.userService.currentUser
         let isStayLoggedIn = backendless.userService.isStayLoggedIn  // var check to see if user it still login
         
@@ -53,7 +59,7 @@ class ViewController: UIViewController {
         
         //addRecord()
         queryData()
-        queryData2()
+        singleStepRetrieval()
         
     }
 
@@ -113,24 +119,6 @@ class ViewController: UIViewController {
 
     }
     
-    func queryData2(){
-        //let backendless = Backendless.sharedInstance()
-        
-        //let queryAccount = Accounts()
-        
-        let dataQuery = BackendlessDataQuery()
-        
-        //dataQuery.queryOptions = queryOptions;
-        dataQuery.whereClause = "type = 'Checking'"
-        
-        let accounts = backendless.persistenceService.find(Accounts.ofClass(), dataQuery:dataQuery) as BackendlessCollection
-        for account in accounts.data as! [Accounts] {
-            
-            print("\(account.NumberOrNickname!)")
-        }
-        
-    }
-    
     
     func loginUserAsync() {
         
@@ -150,10 +138,34 @@ class ViewController: UIViewController {
             print("User has been logged in (SYNC): \(user)")
             self.backendless.userService.setStayLoggedIn( true )  // this is where I could check to see if they check the box to remember login
             },
-                       
-                       catchblock: { (exception) -> Void in
-                        print("Server reported an error: \(exception as! Fault)")
+           catchblock: { (exception) -> Void in
+            print("Server reported an error: \(exception as! Fault)")
         })
+    }
+    
+    
+    func singleStepRetrieval() {
+        
+        let dataQuery = BackendlessDataQuery()
+        let queryOptions = QueryOptions()
+        queryOptions.related = ["relAccounts"];
+        dataQuery.queryOptions = queryOptions
+        
+        var error: Fault?
+        let bc = backendless.data.of(Users.ofClass()).find(dataQuery, fault: &error)
+        if error == nil {
+            let currentAccount = bc.getCurrentPage()
+            print("Loaded \(currentAccount.count) acccounts for user \(currentUser!.email!)")
+            
+            for relatedAccount in currentAccount {
+                print("Account name = \(relatedAccount.NumberOrNickname)")
+            }
+            
+            //print("Accounts have been retrieved: \(bc.data)")
+        }
+        else {
+            print("Server reported an error: \(error)")
+        }
     }
     
 }
