@@ -28,7 +28,7 @@ class ViewController: UIViewController {
         var email : String?
     }
     
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
@@ -46,7 +46,7 @@ class ViewController: UIViewController {
         //backendless.userService.registering(user)
         //print("registered")
         
-        //loginUserAsync()
+        loginUserAsync()
         
         // check to see if keep logged in is turned on.
         if isStayLoggedIn == true{
@@ -60,10 +60,11 @@ class ViewController: UIViewController {
         
         //addRecord()
         queryData()
+        //queryData2()
         singleStepRetrieval()
         
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -87,20 +88,20 @@ class ViewController: UIViewController {
         
         
         
-//        let backendless = Backendless.sharedInstance()
-//        let dataStore = backendless.data.of(Accounts.ofClass())
-//        var error: Fault?
-//        
-//        let result = dataStore.findFault(&error)
-//        if error == nil {
-//            let contacts = result.getCurrentPage()
-//            for obj in contacts {
-//                print("\(obj)")
-//            }
-//        }
-//        else {
-//            print("Server reported an error: \(error)")
-//        }
+        //        let backendless = Backendless.sharedInstance()
+        //        let dataStore = backendless.data.of(Accounts.ofClass())
+        //        var error: Fault?
+        //
+        //        let result = dataStore.findFault(&error)
+        //        if error == nil {
+        //            let contacts = result.getCurrentPage()
+        //            for obj in contacts {
+        //                print("\(obj)")
+        //            }
+        //        }
+        //        else {
+        //            print("Server reported an error: \(error)")
+        //        }
     }
     
     func queryData(){
@@ -117,21 +118,43 @@ class ViewController: UIViewController {
             
             print("\(account.NumberOrNickname!)")
         }
-
+        
     }
+    
+    func queryData2(){
+        
+        //let queryAccount = Accounts()
+        
+        let dataQuery = BackendlessDataQuery()
+        
+        //dataQuery.queryOptions = queryOptions;
+        dataQuery.whereClause = "email = '\(currentUser?.email)'"
+        
+        let accounts = backendless.persistenceService.find(Accounts.ofClass(), dataQuery:dataQuery) as BackendlessCollection
+        
+        print("Loaded \(accounts.data.count) for user \(currentUser?.email)")
+        //        for account in accounts.data as! [Accounts] {
+        //
+        //            print("Loaded \")
+        //            //print("\(account.NumberOrNickname!)")
+        //        }
+        
+    }
+    
+    
     
     
     func loginUserAsync() {
         
         //let backendless = Backendless.sharedInstance()
         
-//        backendless.userService.login("test@outlook.com", password:"1234", response: { ( user : BackendlessUser!) -> () in
-//                    print("User has been logged in (ASYNC): \(user)")
-//            },
-//            error: { ( fault : Fault!) -> () in
-//                print("Server reported an error: \(fault)")
-//            }
-//        )
+        //        backendless.userService.login("test@outlook.com", password:"1234", response: { ( user : BackendlessUser!) -> () in
+        //                    print("User has been logged in (ASYNC): \(user)")
+        //            },
+        //            error: { ( fault : Fault!) -> () in
+        //                print("Server reported an error: \(fault)")
+        //            }
+        //        )
         
         Types.tryblock({ () -> Void in
             
@@ -139,8 +162,8 @@ class ViewController: UIViewController {
             print("User has been logged in (SYNC): \(user)")
             self.backendless.userService.setStayLoggedIn( true )  // this is where I could check to see if they check the box to remember login
             },
-           catchblock: { (exception) -> Void in
-            print("Server reported an error: \(exception as! Fault)")
+                       catchblock: { (exception) -> Void in
+                        print("Server reported an error: \(exception as! Fault)")
         })
     }
     
@@ -149,16 +172,21 @@ class ViewController: UIViewController {
         
         let dataQuery = BackendlessDataQuery()
         let queryOptions = QueryOptions()
-        queryOptions.related = ["relAccounts"];
+        queryOptions.related = ["relAccounts"]
+        //queryOptions.addRelated("relAccounts")
         dataQuery.queryOptions = queryOptions
+        dataQuery.whereClause = "email = '\(currentUser?.email)'"
         
         var error: Fault?
-        let bc = backendless.data.of(Users.ofClass()).find(dataQuery, fault: &error)
+        let bc = backendless.persistenceService.of(Users.ofClass()).find(dataQuery, fault: &error)
         if error == nil {
             let currentAccount = bc.getCurrentPage()
             print("Loaded \(currentAccount.count) acccounts for user \(currentUser!.email!)")
+            print("Total Objects \(bc.totalObjects)")
+            
             
             for relatedAccount in currentAccount {
+                
                 print("Account name = \(relatedAccount.NumberOrNickname)")
             }
             
@@ -168,6 +196,7 @@ class ViewController: UIViewController {
             print("Server reported an error: \(error)")
         }
     }
+
     
 }
 
