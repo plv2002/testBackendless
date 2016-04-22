@@ -46,6 +46,7 @@ class ViewController: UIViewController {
         //backendless.userService.registering(user)
         //print("registered")
         
+        //loginUserAsync()
         
         // check to see if keep logged in is turned on.
         if isStayLoggedIn == true{
@@ -75,7 +76,7 @@ class ViewController: UIViewController {
         
         
         let newAccount = Accounts()
-        newAccount.user = "test@msn.com"
+        newAccount.user = "plv_2002@msn.com"
         newAccount.NumberOrNickname = "Checking3"
         newAccount.type = "Checking"
         newAccount.Balance = 200.05
@@ -134,7 +135,7 @@ class ViewController: UIViewController {
         
         Types.tryblock({ () -> Void in
             
-            let user = self.backendless.userService.login("test@outlook.com", password: "1234")
+            let user = self.backendless.userService.login("plv_2002@msn.com", password: "1234")
             print("User has been logged in (SYNC): \(user)")
             self.backendless.userService.setStayLoggedIn( true )  // this is where I could check to see if they check the box to remember login
             },
